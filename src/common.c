@@ -37,6 +37,8 @@
 #include <time.h>
 #include <common.h>
 
+#include <netdb.h>
+
 #define SU(x) (x!=NULL?x:"Unknown")
 
 int print_cert;
