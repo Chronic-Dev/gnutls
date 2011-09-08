@@ -1,0 +1,214 @@
+TARGET=libgnutls.a
+TARGETXX=libgnutlsxx.a
+
+ifdef LIBTASN1_DIR
+  LIBTASN1DIR=$(LIBTASN1_DIR)
+else
+  LIBTASN1DIR=../libtasn1
+endif
+
+ifdef LIBGCRYPT_DIR
+  LIBGCRYPTDIR=$(LIBGCRYPT_DIR)
+else
+  LIBGCRYPTDIR=../libgcrypt
+endif
+
+ifdef LIBGPGERR_DIR
+  LIBGPGERRDIR=$(LIBGPGERR_DIR)
+else
+  LIBGPGERRDIR=../libgpg-error
+endif
+
+ifdef AWK_PATH
+  AWK := $(AWK_PATH)
+else
+  AWK := $(shell which awk)
+endif
+
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Darwin)
+  ifeq ($(AWK),)
+    AWK := ../tools/osx/awk
+  endif
+  LN_S=ln -f -s
+endif
+
+ifeq ($(UNAME), Linux)
+  ifeq ($(AWK),)
+     $(error Please install awk for your distribution)
+  endif
+  LN_S=ln -f -s
+endif
+
+CFLAGS=-m32 -I. -Ilib -Ilib/includes -Ilibextra/includes -Ilib/x509 -Ilib/openpgp -Ilib/opencdk -Ilib/gl -Igl -Isrc -I$(LIBTASN1DIR)/lib -I$(LIBGCRYPTDIR)/src -I$(LIBGPGERRDIR)/src -fvisibility=hidden -Wall -O2 -fPIC -DPIC -DHAVE_CONFIG_H -DENABLE_OPENPGP -DENABLE_PKI -DENABLE_PSK -DENABLE_ANON -DENABLE_SRP -D_GCRYPT_IN_LIBGCRYPT
+
+CLEANFILES=
+
+ifeq ($(UNAME), Darwin)
+  check_arch = $(shell if as -arch $(1) -o /dev/null < /dev/null > /dev/null; then echo yes; else echo no; fi)
+  ifeq ($(call check_arch,i386), yes)
+    CFLAGS+=-arch i386
+  endif
+  ifeq ($(call check_arch,ppc), yes)
+    CFLAGS+=-arch ppc
+  endif
+  $(shell ln -s -f byteswap.in.h lib/gl/byteswap.h)
+  CLEANFILES+=lib/gl/byteswap.h
+endif
+
+ifeq ($(UNAME), Linux)
+endif
+
+CXXFLAGS=$(CFLAGS)
+
+objects= \
+	lib/gnutls_record.o \
+	lib/gnutls_compress.o \
+	lib/debug.o \
+	lib/gnutls_cipher.o \
+	lib/gnutls_buffers.o \
+	lib/gnutls_handshake.o \
+	lib/gnutls_num.o \
+	lib/gnutls_errors.o \
+	lib/gnutls_algorithms.o \
+	lib/gnutls_dh.o \
+	lib/gnutls_kx.o \
+	lib/gnutls_priority.o \
+	lib/gnutls_hash_int.o \
+	lib/gnutls_cipher_int.o \
+	lib/gnutls_session.o \
+	lib/gnutls_db.o \
+	lib/x509_b64.o \
+	lib/auth_anon.o \
+	lib/gnutls_extensions.o \
+	lib/gnutls_auth.o \
+	lib/gnutls_v2_compat.o \
+	lib/gnutls_datum.o \
+	lib/auth_rsa.o \
+	lib/gnutls_session_pack.o \
+	lib/gnutls_mpi.o \
+	lib/gnutls_pk.o \
+	lib/gnutls_cert.o \
+	lib/gnutls_global.o \
+	lib/gnutls_constate.o \
+	lib/gnutls_anon_cred.o \
+	lib/pkix_asn1_tab.o \
+	lib/gnutls_asn1_tab.o \
+	lib/gnutls_mem.o \
+	lib/auth_cert.o \
+	lib/gnutls_ui.o \
+	lib/gnutls_sig.o \
+	lib/auth_dhe.o \
+	lib/gnutls_dh_primes.o \
+	lib/ext_max_record.o \
+	lib/gnutls_alert.o \
+	lib/gnutls_str.o \
+	lib/gnutls_state.o \
+	lib/gnutls_x509.o \
+	lib/ext_cert_type.o \
+	lib/gnutls_rsa_export.o \
+	lib/auth_rsa_export.o \
+	lib/ext_server_name.o \
+	lib/auth_dh_common.o \
+	lib/gnutls_helper.o \
+	lib/gnutls_supplemental.o \
+	lib/crypto.o \
+	lib/random.o \
+	lib/pk-libgcrypt.o \
+	lib/mpi-libgcrypt.o \
+	lib/rnd-libgcrypt.o \
+	lib/cipher-libgcrypt.o \
+	lib/mac-libgcrypt.o \
+	lib/ext_srp.o \
+	lib/gnutls_srp.o \
+	lib/auth_srp.o \
+	lib/auth_srp_passwd.o \
+	lib/auth_srp_sb64.o \
+	lib/auth_srp_rsa.o \
+	lib/auth_psk.o \
+	lib/auth_psk_passwd.o \
+	lib/gnutls_psk.o \
+	lib/auth_dhe_psk.o \
+	lib/gnutls_psk_netconf.o \
+	gl/c-ctype.o \
+	gl/close-hook.o \
+	gl/sockets.o \
+	gl/asnprintf.o \
+	gl/printf-args.o \
+	gl/printf-parse.o \
+	gl/read-file.o \
+	gl/vasnprintf.o \
+	src/common.o \
+	lib/x509/crl.o \
+	lib/x509/crl_write.o \
+	lib/x509/crq.o \
+	lib/x509/dn.o \
+	lib/x509/extensions.o \
+	lib/x509/mpi.o \
+	lib/x509/output.o \
+	lib/x509/pbkdf2-sha1.o \
+	lib/x509/pkcs12.o \
+	lib/x509/pkcs12_bag.o \
+	lib/x509/pkcs12_encr.o \
+	lib/x509/pkcs7.o \
+	lib/x509/privkey.o \
+	lib/x509/privkey_pkcs8.o \
+	lib/x509/rfc2818_hostname.o \
+	lib/x509/sign.o \
+	lib/x509/verify.o \
+	lib/x509/x509.o \
+	lib/x509/x509_write.o \
+	lib/openpgp/pgp.o \
+	lib/openpgp/pgpverify.o \
+	lib/openpgp/extras.o \
+	lib/openpgp/compat.o \
+	lib/openpgp/lt1-privkey.o \
+	lib/openpgp/lt2-output.o \
+	lib/openpgp/gnutls_openpgp.o \
+	lib/opencdk/armor.o \
+	lib/opencdk/main.o \
+	lib/opencdk/kbnode.o \
+	lib/opencdk/dummy.o \
+	lib/opencdk/sig-check.o \
+	lib/opencdk/lt3-verify.o \
+	lib/opencdk/hash.o \
+	lib/opencdk/keydb.o \
+	lib/opencdk/pubkey.o \
+	lib/opencdk/stream.o \
+	lib/opencdk/write-packet.o \
+	lib/opencdk/misc.o \
+	lib/opencdk/seskey.o \
+	lib/opencdk/literal.o \
+	lib/opencdk/new-packet.o \
+	lib/opencdk/read-packet.o \
+
+objectsxx= \
+	lib/gnutlsxx.cpp.o \
+
+all: $(TARGET) $(TARGETXX)
+
+
+%.o: %.c
+	$(CC) -o $@ $(CFLAGS) -c $<
+
+%.cpp.o: %.cpp
+	$(CXX) -o $@ $(CXXFLAGS) -c $<
+
+lib/openpgp/lt1-privkey.o: lib/openpgp/privkey.c
+	$(CC) -o $@ $(CFLAGS) -c $<
+
+lib/openpgp/lt2-output.o: lib/openpgp/output.c
+	$(CC) -o $@ $(CFLAGS) -c $<
+
+lib/opencdk/lt3-verify.o: lib/opencdk/verify.c
+	$(CC) -o $@ $(CFLAGS) -c $<
+
+$(TARGET): $(objects)
+	$(AR) rcs $@ $(objects)
+
+$(TARGETXX): $(objectsxx)
+	$(AR) rcs $@ $(objectsxx)
+
+clean:
+	rm -f lib/*.o lib/x509/*.o lib/opencdk/*.o lib/openpgp/*.o src/*.o gl/*.o $(TARGET) $(TARGETXX) $(CLEANFILES)

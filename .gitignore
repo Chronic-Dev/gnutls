@@ -444,3 +444,6 @@ tests/x509paths/
 tests/x509self
 tests/x509sign-verify
 tests/x509signself
+lib/gl/byteswap.h
+libgnutls.a
+libgnutlsxx.a
