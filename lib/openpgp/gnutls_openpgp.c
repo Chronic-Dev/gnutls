@@ -812,8 +812,7 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 
       _gnutls_debug_log
         ("Importing Openpgp cert and using openpgp sub key: %s\n",
-         _gnutls_bin2hex (keyid, GNUTLS_OPENPGP_KEYID_SIZE, err_buf, sizeof (err_buf),
-                          NULL));
+         _gnutls_bin2hex (keyid, GNUTLS_OPENPGP_KEYID_SIZE, err_buf, sizeof (err_buf)));
 
       KEYID_IMPORT (kid32, keyid);
 
