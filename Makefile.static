@@ -41,7 +41,7 @@ ifeq ($(UNAME), Linux)
   LN_S=ln -f -s
 endif
 
-CFLAGS=-m32 -I. -Ilib -Ilib/includes -Ilibextra/includes -Ilib/x509 -Ilib/openpgp -Ilib/opencdk -Ilib/gl -Igl -Isrc -I$(LIBTASN1DIR)/lib -I$(LIBGCRYPTDIR)/src -I$(LIBGPGERRDIR)/src -fvisibility=hidden -Wall -O2 -fPIC -DPIC -DHAVE_CONFIG_H -DENABLE_OPENPGP -DENABLE_PKI -DENABLE_PSK -DENABLE_ANON -DENABLE_SRP -D_GCRYPT_IN_LIBGCRYPT
+CFLAGS=-m32 -I. -Ilib -Ilib/includes -Ilibextra/includes -Ilib/x509 -Ilib/openpgp -Ilib/opencdk -Ilib/gl -Igl -Isrc -I$(LIBTASN1DIR)/lib -I$(LIBGCRYPTDIR)/src -I$(LIBGPGERRDIR)/src -Wall -O2 -DHAVE_CONFIG_H -DENABLE_OPENPGP -DENABLE_PKI -DENABLE_PSK -DENABLE_ANON -DENABLE_SRP -D_GCRYPT_IN_LIBGCRYPT
 
 CLEANFILES=
 
@@ -53,11 +53,31 @@ ifeq ($(UNAME), Darwin)
   ifeq ($(call check_arch,ppc), yes)
     CFLAGS+=-arch ppc
   endif
+  CFLAGS+=-fPIC -DPIC -fvisibility=hidden
   $(shell ln -s -f byteswap.in.h lib/gl/byteswap.h)
   CLEANFILES+=lib/gl/byteswap.h
 endif
 
 ifeq ($(UNAME), Linux)
+  CFLAGS+=-fPIC -DPIC -fvisibility=hidden
+endif
+
+WIN32=
+ifeq ($(findstring CYG,$(UNAME)), CYG)
+  WIN32=1
+  CC=gcc-3
+endif
+ifeq ($(findstring MINGW,$(UNAME)), MINGW)
+  WIN32=1
+  CC=gcc
+endif
+ifdef WIN32
+  CFLAGS+=-DWIN32 -Ilib/includes/missing \
+	-DHAVE_WINSOCK2_H=1 \
+	-DIN_LIBINTL=1 \
+	-DEWOULDBLOCK=WSAEWOULDBLOCK
+  $(shell ln -s -f byteswap.in.h lib/gl/byteswap.h)
+  CLEANFILES+=lib/gl/byteswap.h
 endif
 
 CXXFLAGS=$(CFLAGS)
@@ -182,6 +202,10 @@ objects= \
 	lib/opencdk/literal.o \
 	lib/opencdk/new-packet.o \
 	lib/opencdk/read-packet.o \
+
+ifdef WIN32
+  objects+=gl/socket.o
+endif
 
 objectsxx= \
 	lib/gnutlsxx.cpp.o \
