@@ -97,3 +97,10 @@
 #ifndef __cplusplus
 /* #undef inline */
 #endif
+
+#ifndef GNUTLS_POINTER_TO_INT 
+#define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
+#endif
+#ifndef GNUTLS_POINTER_TO_INT_CAST
+#define GNUTLS_POINTER_TO_INT_CAST(_) (_)
+#endif

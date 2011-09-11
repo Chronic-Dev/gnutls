@@ -75,7 +75,8 @@ ifdef WIN32
   CFLAGS+=-DWIN32 -Ilib/includes/missing \
 	-DHAVE_WINSOCK2_H=1 \
 	-DIN_LIBINTL=1 \
-	-DEWOULDBLOCK=WSAEWOULDBLOCK
+	-DEWOULDBLOCK=WSAEWOULDBLOCK \
+	-DEOVERFLOW=75
   $(shell ln -s -f byteswap.in.h lib/gl/byteswap.h)
   CLEANFILES+=lib/gl/byteswap.h
 endif
@@ -101,6 +102,7 @@ objects= \
 	lib/gnutls_db.o \
 	lib/x509_b64.o \
 	lib/auth_anon.o \
+	lib/ext_safe_renegotiation.o \
 	lib/gnutls_extensions.o \
 	lib/gnutls_auth.o \
 	lib/gnutls_v2_compat.o \
@@ -116,6 +118,7 @@ objects= \
 	lib/pkix_asn1_tab.o \
 	lib/gnutls_asn1_tab.o \
 	lib/gnutls_mem.o \
+	lib/ext_signature.o \
 	lib/auth_cert.o \
 	lib/gnutls_ui.o \
 	lib/gnutls_sig.o \
@@ -134,6 +137,7 @@ objects= \
 	lib/gnutls_helper.o \
 	lib/gnutls_supplemental.o \
 	lib/crypto.o \
+	lib/cryptodev.o \
 	lib/random.o \
 	lib/pk-libgcrypt.o \
 	lib/mpi-libgcrypt.o \
@@ -160,6 +164,7 @@ objects= \
 	gl/read-file.o \
 	gl/vasnprintf.o \
 	src/common.o \
+	lib/x509/common.o \
 	lib/x509/crl.o \
 	lib/x509/crl_write.o \
 	lib/x509/crq.o \
@@ -204,7 +209,10 @@ objects= \
 	lib/opencdk/read-packet.o \
 
 ifdef WIN32
-  objects+=gl/socket.o
+  objects+=gl/socket.o \
+	lib/gl/memmem.o \
+	lib/gl/asprintf.o \
+	lib/gl/vasprintf.o
 endif
 
 objectsxx= \
