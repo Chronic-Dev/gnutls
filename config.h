@@ -104,3 +104,7 @@
 #ifndef GNUTLS_POINTER_TO_INT_CAST
 #define GNUTLS_POINTER_TO_INT_CAST(_) (_)
 #endif
+
+#ifdef WIN32
+#define restrict const
+#endif

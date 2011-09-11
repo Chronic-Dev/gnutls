@@ -211,6 +211,7 @@ objects= \
 ifdef WIN32
   objects+=gl/socket.o \
 	lib/gl/memmem.o \
+	lib/gl/time_r.o \
 	lib/gl/asprintf.o \
 	lib/gl/vasprintf.o
 endif
