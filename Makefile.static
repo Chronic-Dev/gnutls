@@ -208,6 +208,10 @@ objects= \
 	lib/opencdk/new-packet.o \
 	lib/opencdk/read-packet.o \
 
+ifeq ($(UNAME), Darwin)
+  objects+=lib/gl/memmem.o
+endif
+
 ifdef WIN32
   objects+=gl/socket.o \
 	lib/gl/memmem.o \
